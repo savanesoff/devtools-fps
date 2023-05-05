@@ -1,0 +1,35 @@
+{
+  "name": "devtools-fps",
+  "version": "1.0.0",
+  "description": "FPS monitor devtool used for monitoring FPS while browser devtools are inactive in order to monitor FPS without other processes running at the same time, but also while application is rendered at full screen. Devtools-fps allows you to interact with it by pausing recording and inspecing specific frame performance and time the frame was rendered at in order to cross reference it with application activity. ",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "test",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/savanesoff/devtools-fps.git"
+  },
+  "keywords": [
+    "fps",
+    "devtools",
+    "npm",
+    "package",
+    "monitoring"
+  ],
+  "author": "savanesoff",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/savanesoff/devtools-fps/issues"
+  },
+  "homepage": "https://github.com/savanesoff/devtools-fps#readme",
+  "devDependencies": {
+    "@types/events": "^3.0.0",
+    "@types/json-schema": "^7.0.11",
+    "@typescript-eslint/eslint-plugin": "^5.59.2",
+    "@typescript-eslint/parser": "^5.59.2",
+    "eslint": "^8.39.0",
+    "typescript": "^5.0.4"
+  }
+}
