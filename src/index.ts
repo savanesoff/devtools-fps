@@ -237,11 +237,11 @@ function onMouseOver(e: MouseEvent) {
     TIME_FORMAT
   );
 
-  data.tooltip.innerText = `${fps.toFixed(1)} fps\n${time}`;
-
   if (!data.tooltip) {
     initTooltip();
   }
+
+  data.tooltip.innerText = `${fps.toFixed(1)} fps\n${time}`;
   document.body.appendChild(data.tooltip);
 
   const tooltipWidth = data.tooltip.offsetWidth;
