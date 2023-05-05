@@ -222,6 +222,7 @@ function onInspectModeOff() {
 }
 
 function onMouseOut() {
+  if (!data.tooltip || !data.tooltip.parentNode) return;
   document.body.removeChild(data.tooltip);
 }
 
