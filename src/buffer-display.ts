@@ -9,7 +9,7 @@ const timing = {
 
 const style = {
   x: 0,
-  marginTop: 20,
+  marginTop: 24,
   minimumSliceHeight: 0.5,
 };
 
@@ -34,7 +34,6 @@ export function renderBuffer(
   );
   let sliceWidth = (canvas.width * 1.0) / buffer.length;
   let x = 0;
-  let y = 0;
 
   for (let i = 0; i < buffer.length; i++) {
     const sliceY =
@@ -43,7 +42,7 @@ export function renderBuffer(
         (canvas.height - style.marginTop);
 
     canvas.ctx.fillStyle = getFPSColor(buffer[i]);
-    canvas.ctx.fillRect(x, sliceY, sliceWidth, canvas.height - y);
+    canvas.ctx.fillRect(x, sliceY, sliceWidth, canvas.height - sliceY);
     x += sliceWidth;
   }
 }
