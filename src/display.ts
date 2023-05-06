@@ -16,9 +16,7 @@ const style = {
   position: "absolute",
   top: "0",
   left: "0",
-  width: "380px",
-  height: "160px",
-  backgroundColor: "rgba(,,0,0,0.4)",
+  backgroundColor: "rgba(0,0,0,0.2)",
   zIndex: "999999",
 };
 
@@ -52,6 +50,23 @@ export function removeCanvas(window: Window) {
   window.devtools_fps_display = null;
 }
 
+function renderIcon(inspectMode: boolean, canvas: HTMLCanvasElement) {
+  if (inspectMode) {
+    canvas.ctx.fillStyle = getFPSColor(0);
+    canvas.ctx.clearRect(canvas.width - 20, 5, 20, 15);
+    canvas.ctx.fillRect(canvas.width - 20, 5, 6, 15);
+    canvas.ctx.fillRect(canvas.width - 10, 5, 6, 15);
+  } else {
+    canvas.ctx.fillStyle = getFPSColor(60);
+    // draw play icon
+    canvas.ctx.beginPath();
+    canvas.ctx.moveTo(canvas.width - 20, 5);
+    canvas.ctx.lineTo(canvas.width - 20, 20);
+    canvas.ctx.lineTo(canvas.width - 6, 12);
+    canvas.ctx.fill();
+  }
+}
+
 /**
  * Creates the canvas element and appends it to the body
  */
@@ -59,6 +74,7 @@ export function renderCanvas(state: State, buffer: Float32Array) {
   const canvas = getCanvas();
   renderFPS(canvas, state);
   renderBuffer(canvas, state, buffer);
+  renderIcon(state.inspect, canvas);
 }
 
 export function setDisplayState(state: State) {
