@@ -19,7 +19,7 @@ const style = {
   position: "absolute",
   top: "0",
   left: "0",
-  backgroundColor: "rgba(,,0,0,0.8)",
+  backgroundColor: "rgba(0,0,0,0.8)",
   color: "white",
   padding: "5px",
   borderRadius: "5px",
