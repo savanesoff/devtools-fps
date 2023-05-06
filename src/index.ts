@@ -83,15 +83,16 @@ export function stop() {
  */
 export function start({
   bufferSize = 0,
-  style = {} as Partial<CSSStyleDeclaration>,
+  style = {} as Omit<Partial<CSSStyleDeclaration>, "width" | "height">,
+  width = CONFIG.width,
+  height = CONFIG.height,
 } = {}) {
   state.render = true;
-  CONFIG.width = style.width ? parseInt(style.width) : CONFIG.width;
-  CONFIG.height = style.height ? parseInt(style.height) : CONFIG.height;
+
   const canvas = getCanvas();
   (<any>Object).assign(canvas.style, style);
-  canvas.width = CONFIG.width;
-  canvas.height = CONFIG.height;
+  canvas.width = CONFIG.width = width;
+  canvas.height = CONFIG.height = height;
   canvas.addEventListener("click", onClick);
   buffers.times = new Float32Array(bufferSize || CONFIG.width).fill(state.now);
   buffers.fps = new Float32Array(bufferSize || CONFIG.width).fill(state.fps);
@@ -102,7 +103,7 @@ export function start({
  */
 function update() {
   computeState();
-  renderCanvas(state, buffers.fps);
+  if (!state.inspect) renderCanvas(state, buffers.fps);
   if (state.run) requestAnimationFrame(update);
   else console.log("FPS Monitor stopped");
 }
@@ -115,7 +116,7 @@ function computeState() {
   state.delta = state.now - state.last;
   state.last = state.now;
   state.fps = Math.min(1000 / state.delta, CONFIG.maxFPS);
-  state.averageFPS = shiftLeft(state.fps) / buffers.fps.length;
+  state.averageFPS = shiftLeft(state.fps);
 }
 
 /**
@@ -150,6 +151,8 @@ function onInspectModeOn(e: MouseEvent) {
   // create a snapshot of the buffers
   buffers.fpsSnapshot = new Float32Array(buffers.fps);
   buffers.timesSnapshot = new Float32Array(buffers.times);
+
+  renderCanvas(state, buffers.fpsSnapshot);
   // add event listeners to the canvas
   canvas.addEventListener("mousemove", onMouseOver);
   canvas.addEventListener("mouseout", removeTooltip);
