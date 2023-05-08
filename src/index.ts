@@ -89,8 +89,8 @@ export function setSize({
   height,
 }: { width?: number; height?: number } = {}) {
   const canvas = getCanvas();
-  canvas.width = CONFIG.width = width || CONFIG.width;
-  canvas.height = CONFIG.height = height || CONFIG.height;
+  canvas.width = CONFIG.width = width || canvas.width || CONFIG.width;
+  canvas.height = CONFIG.height = height || canvas.height || CONFIG.height;
 }
 
 export function setBufferSize(size: number) {
