@@ -73,10 +73,14 @@ function renderIcon(inspectMode: boolean, canvas: HTMLCanvasElement) {
 /**
  * Creates the canvas element and appends it to the body
  */
-export function renderCanvas(state: State, buffer: Float32Array) {
+export function renderCanvas(
+  state: State,
+  buffer: Float32Array,
+  force = false
+) {
   const canvas = getCanvas();
-  renderFPS(canvas, state);
-  renderBuffer(canvas, state, buffer);
+  renderFPS(canvas, state, force);
+  renderBuffer(canvas, state, buffer, force);
   renderIcon(state.inspect, canvas);
 }
 

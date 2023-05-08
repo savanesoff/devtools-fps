@@ -23,8 +23,12 @@ const style = {
   },
 };
 
-export function renderFPS(canvas: HTMLCanvasElement, state: State) {
-  if (!canvas.ctx || state.now - timing.last < timing.interval) {
+export function renderFPS(
+  canvas: HTMLCanvasElement,
+  state: State,
+  force = false
+) {
+  if (!canvas.ctx || (!force && state.now - timing.last < timing.interval)) {
     return;
   }
 

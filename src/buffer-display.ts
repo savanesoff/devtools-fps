@@ -2,7 +2,7 @@ import { CONFIG, State } from ".";
 import { getFPSColor } from "./colors";
 
 const timing = {
-  interval: 1000 / 30, // 10 times per second
+  interval: 1000 / 20, // 10 times per second
   last: 0,
   initialDraw: false,
 };
@@ -19,9 +19,10 @@ const style = {
 export function renderBuffer(
   canvas: HTMLCanvasElement,
   state: State,
-  buffer: Float32Array
+  buffer: Float32Array,
+  force = false
 ) {
-  if (!canvas.ctx || state.now - timing.last < timing.interval) {
+  if (!canvas.ctx || (!force && state.now - timing.last < timing.interval)) {
     return;
   }
   timing.last = state.now;
