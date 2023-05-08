@@ -42,7 +42,12 @@ export function renderBuffer(
         (canvas.height - style.marginTop);
 
     canvas.ctx.fillStyle = getFPSColor(buffer[i]);
-    canvas.ctx.fillRect(x, sliceY, sliceWidth, canvas.height - sliceY);
+    canvas.ctx.fillRect(
+      x,
+      sliceY,
+      Math.ceil(sliceWidth),
+      canvas.height - sliceY
+    );
     x += sliceWidth;
   }
 }
