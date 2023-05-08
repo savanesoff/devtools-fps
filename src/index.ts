@@ -140,8 +140,62 @@ export function start({
   const canvas = getCanvas();
   // assign styles
   (<any>Object).assign(canvas.style, style);
-  canvas.addEventListener("click", onClick);
+
+  canvas.addEventListener("mousedown", onMousedown, true);
   setBufferSize(bufferSize);
+}
+
+const offset = {
+  x: 0,
+  y: 0,
+  startX: 0,
+  startY: 0,
+  snap: 20,
+};
+
+function onMousedown(e: MouseEvent): void {
+  const canvas = getCanvas();
+  const rect = canvas.getBoundingClientRect();
+  offset.startX = e.pageX;
+  offset.startY = e.pageY;
+  offset.x = e.pageX - rect.left;
+  offset.y = e.pageY - rect.top;
+
+  window?.addEventListener("mousemove", onMousemove);
+
+  window?.addEventListener("mouseup", onMouseUp);
+  e.preventDefault();
+}
+
+function onMouseUp(e: MouseEvent) {
+  const moved =
+    Math.abs(offset.startX - e.pageX) > 5 ||
+    Math.abs(offset.startY - e.pageY) > 5;
+
+  window?.removeEventListener("mousemove", onMousemove);
+  if (!moved) {
+    onClick(e);
+  }
+}
+
+function onMousemove(e: MouseEvent) {
+  const canvas = getCanvas();
+  const x = e.pageX - offset.x;
+  const y = e.pageY - offset.y;
+  const left =
+    x < offset.snap
+      ? 0
+      : x + canvas.width + offset.snap > window.innerWidth
+      ? window.innerWidth - canvas.width
+      : x;
+  const top =
+    y < offset.snap
+      ? 0
+      : y + canvas.height + offset.snap > window.innerHeight
+      ? window.innerHeight - canvas.height
+      : y;
+  canvas.style.left = left + "px";
+  canvas.style.top = top + "px";
 }
 
 /**
@@ -189,8 +243,10 @@ function shiftLeft(fps: number, time: number): number {
 }
 
 function onClick(e: MouseEvent) {
+  e.preventDefault();
   if (state.inspect) onInspectModeOff(e);
   else onInspectModeOn(e);
+  return false;
 }
 
 function onInspectModeOn(e: MouseEvent) {
@@ -205,6 +261,7 @@ function onInspectModeOn(e: MouseEvent) {
 
   renderCanvas(state, buffers.fpsSnapshot);
   // add event listeners to the canvas
+
   canvas.addEventListener("mousemove", onMouseOver);
   canvas.addEventListener("mouseout", removeTooltip);
   // render the tooltip for the current mouse position
