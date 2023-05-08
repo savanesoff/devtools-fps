@@ -5,7 +5,7 @@ import { renderFPS } from "./fps-display";
 
 declare global {
   interface Window {
-    devtools_fps_display: HTMLCanvasElement;
+    devtools_fps_display: HTMLCanvasElement | null;
   }
   interface HTMLCanvasElement {
     ctx: CanvasRenderingContext2D | null;
@@ -14,7 +14,8 @@ declare global {
 
 const style = {
   position: "absolute",
-  top: "0",
+  top: "auto",
+  bottom: "0",
   left: "0",
   backgroundColor: "rgba(0,0,0,0.2)",
   zIndex: "999999",
@@ -51,6 +52,7 @@ export function removeCanvas(window: Window) {
 }
 
 function renderIcon(inspectMode: boolean, canvas: HTMLCanvasElement) {
+  if (!canvas.ctx) return;
   if (inspectMode) {
     canvas.ctx.fillStyle = getFPSColor(0);
     canvas.ctx.clearRect(canvas.width - 20, 5, 20, 15);

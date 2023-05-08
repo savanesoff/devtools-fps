@@ -24,7 +24,7 @@ const style = {
 };
 
 export function renderFPS(canvas: HTMLCanvasElement, state: State) {
-  if (state.now - timing.last < timing.interval) {
+  if (!canvas.ctx || state.now - timing.last < timing.interval) {
     return;
   }
 

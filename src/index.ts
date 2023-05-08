@@ -28,13 +28,13 @@ export type State = {
   averageFPS: number;
 };
 
-const state: State = {
+export const state: State = {
   /** Will inspect the buffers */
   inspect: false,
   /** Will run in the background bu wouldn't render. This is to so the buffers are up to date when render is required */
   run: true,
   /** Will render the monitor */
-  render: false,
+  render: true,
   /* The last time the FPS was updated */
   last: performance.now() - 1000 / CONFIG.maxFPS,
   /* Current frame timestamp */
@@ -67,16 +67,42 @@ const buffers: Buffers = {
 requestAnimationFrame(() => {
   // we want to guard against multiple imports or multiple starts
   // specifically, we want to avoid multiple update loops with hot module reloading
-  if (!window.devtools_fps_running) update();
+  if (!window.devtools_fps_running) {
+    start();
+    update();
+  }
   window.devtools_fps_running = true;
   console.info("devtools-fps started...");
 });
 
-export function stop() {
-  state.run = false;
-  state.render = false;
+export function toggleRender() {
+  state.render = !state.render;
 }
 
+export function toggleRun() {
+  state.run = !state.run;
+  if (state.run) update();
+}
+
+export function setSize({
+  width,
+  height,
+}: { width?: number; height?: number } = {}) {
+  const canvas = getCanvas();
+  canvas.width = CONFIG.width = width || CONFIG.width;
+  canvas.height = CONFIG.height = height || CONFIG.height;
+}
+
+export function setBufferSize(size: number) {
+  buffers.times = new Float32Array(size).map(
+    (_, i) =>
+      buffers.times[i - (size - buffers.times.length || 0)] || buffers.times[0]
+  );
+  buffers.fps = new Float32Array(size).map(
+    (_, i) =>
+      buffers.fps[i - (size - buffers.fps.length || 0)] || buffers.fps[0]
+  );
+}
 /**
  * Start rendering the FPS monitor
  *
@@ -88,7 +114,6 @@ export function start({
   height = CONFIG.height,
 } = {}) {
   state.render = true;
-
   const canvas = getCanvas();
   (<any>Object).assign(canvas.style, style);
   canvas.width = CONFIG.width = width;
@@ -103,7 +128,7 @@ export function start({
  */
 function update() {
   computeState();
-  if (!state.inspect) renderCanvas(state, buffers.fps);
+  if (!state.inspect && state.render) renderCanvas(state, buffers.fps);
   if (state.run) requestAnimationFrame(update);
   else console.log("FPS Monitor stopped");
 }
