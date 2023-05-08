@@ -2,7 +2,7 @@ import { getFPSColor } from "./colors";
 
 declare global {
   interface Window {
-    devtools_fps_tooltip: HTMLDivElement;
+    devtools_fps_tooltip: HTMLDivElement | null;
   }
 }
 
@@ -62,7 +62,7 @@ function setTooltipPosition(tooltip: HTMLElement, e: MouseEvent) {
 }
 
 export function renderTooltip(e: MouseEvent, fps: number, timestamp: number) {
-  const tooltip = getTooltip(e.view);
+  const tooltip = getTooltip(e.view || window);
   const time = new Date(performance.timeOrigin + timestamp).toLocaleTimeString(
     "en-US",
     TIME_FORMAT
