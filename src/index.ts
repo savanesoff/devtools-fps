@@ -90,8 +90,29 @@ export function setSize({
   height,
 }: { width?: number; height?: number } = {}) {
   const canvas = getCanvas();
-  canvas.width = CONFIG.width = width || canvas.width || CONFIG.width;
-  canvas.height = CONFIG.height = height || canvas.height || CONFIG.height;
+  canvas.width = CONFIG.width = Math.min(
+    width || canvas.width || CONFIG.width,
+    window.innerWidth
+  );
+  canvas.height = CONFIG.height = Math.min(
+    height || canvas.height || CONFIG.height,
+    window.innerHeight / 3
+  );
+
+  const rect = canvas.getBoundingClientRect();
+  const left =
+    rect.right > window.innerWidth
+      ? window.innerWidth - canvas.width
+      : canvas.style.left || 0;
+
+  canvas.style.left = left + "px";
+
+  const top =
+    rect.bottom > window.innerHeight
+      ? window.innerHeight - canvas.height
+      : canvas.style.top || 0;
+
+  canvas.style.top = top + "px";
 }
 
 export function setBufferSize(size: number) {
