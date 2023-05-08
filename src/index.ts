@@ -15,6 +15,7 @@ export const CONFIG = {
   left: 0,
   right: 0,
   bottom: 0,
+  minBufferTimeSlice: 1000 / 30,
 };
 
 export type State = {
@@ -94,12 +95,13 @@ export function setSize({
 }
 
 export function setBufferSize(size: number) {
-  buffers.times = new Float32Array(size).map(
+  const length = size || CONFIG.width;
+  buffers.times = new Float32Array(length).map(
     (_, i) =>
-      buffers.times[i - (size - buffers.times.length)] || buffers.times[0]
+      buffers.times[i - (length - buffers.times.length)] || buffers.times[0]
   );
-  buffers.fps = new Float32Array(size).map(
-    (_, i) => buffers.fps[i - (size - buffers.fps.length)] || buffers.fps[0]
+  buffers.fps = new Float32Array(length).map(
+    (_, i) => buffers.fps[i - (length - buffers.fps.length)] || buffers.fps[0]
   );
 }
 /**
@@ -113,13 +115,12 @@ export function start({
   height = CONFIG.height,
 } = {}) {
   state.render = true;
+  setSize({ width, height });
   const canvas = getCanvas();
+  // assign styles
   (<any>Object).assign(canvas.style, style);
-  canvas.width = CONFIG.width = width;
-  canvas.height = CONFIG.height = height;
   canvas.addEventListener("click", onClick);
-  buffers.times = new Float32Array(bufferSize || CONFIG.width).fill(state.now);
-  buffers.fps = new Float32Array(bufferSize || CONFIG.width).fill(state.fps);
+  setBufferSize(bufferSize);
 }
 
 /**
@@ -140,7 +141,12 @@ function computeState() {
   state.delta = state.now - state.last;
   state.last = state.now;
   state.fps = Math.min(1000 / state.delta, CONFIG.maxFPS);
-  state.averageFPS = shiftLeft(state.fps);
+  // If the delta is too large, we need to fill the buffer with missing values
+  const missing = Math.floor(state.delta / CONFIG.minBufferTimeSlice);
+  for (let i = 0; i < missing; i++) {
+    shiftLeft(state.fps, state.now - (missing - i) * CONFIG.minBufferTimeSlice);
+  }
+  state.averageFPS = shiftLeft(state.fps, state.now);
 }
 
 /**
@@ -149,15 +155,15 @@ function computeState() {
  * But also, the buffer is used to draw the graph
  * @param value average FPS value
  */
-function shiftLeft(value: number): number {
+function shiftLeft(fps: number, time: number): number {
   let total = 0;
   for (let i = 0; i < buffers.fps.length - 1; i++) {
     total += buffers.fps[i];
     buffers.fps[i] = buffers.fps[i + 1]; // Shift left
     buffers.times[i] = buffers.times[i + 1];
   }
-  buffers.times[buffers.times.length - 1] = state.now;
-  buffers.fps[buffers.fps.length - 1] = value; // Place new value at tail
+  buffers.times[buffers.times.length - 1] = time;
+  buffers.fps[buffers.fps.length - 1] = fps; // Place new value at tail
   return total / buffers.fps.length;
 }
 
