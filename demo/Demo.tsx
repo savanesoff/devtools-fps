@@ -41,69 +41,120 @@ function Demo() {
             {state.run ? "Stop Running" : "Start Running"}
           </button>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-around",
+          <Range
+            exec={(value) => {
+              setSize({
+                width: value,
+              });
             }}
-          >
-            <label htmlFor="width">Width</label>
-            <input
-              type="range"
-              min="200"
-              max={window.innerWidth}
-              name="width"
-              defaultValue={200}
-              onChange={(event) => {
-                setSize({
-                  width: Number(event.target.value),
-                });
-              }}
-            />
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-around",
+            min={100}
+            max={window.innerWidth}
+            name="Width"
+            current={200}
+          />
+          <Range
+            exec={(value) => {
+              setSize({
+                height: value,
+              });
             }}
-          >
-            <label htmlFor="height">Height</label>
-            <input
-              type="range"
-              min="80"
-              max="500"
-              name="height"
-              onChange={(event) => {
-                setSize({
-                  height: Number(event.target.value),
-                });
-              }}
-            />
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-around",
-            }}
-          >
-            <label htmlFor="buffer">Buffer Size</label>
-            <input
-              type="range"
-              min="100"
-              max={window.innerWidth}
-              name="buffer"
-              onChange={(event) => {
-                setBufferSize(Number(event.target.value));
-              }}
-            />
-          </div>
+            min={100}
+            max={500}
+            name="Height"
+            current={200}
+          />
+
+          <Range
+            exec={setBufferSize}
+            min={100}
+            max={window.innerWidth}
+            name="Buffer Size"
+            current={200}
+          />
+
+          <Range
+            exec={stress}
+            min={0}
+            max={100}
+            name="Stress level %"
+            current={0}
+          />
         </div>
       </div>
     </div>
   );
+}
+function Range({
+  exec,
+  name,
+  min,
+  max,
+  current,
+}: {
+  exec: (value: number) => void;
+  name: string;
+  min: number;
+  max: number;
+  current?: number;
+}) {
+  const [value, setValue] = React.useState(current || min);
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-around",
+      }}
+    >
+      <label htmlFor={name}>
+        {name}: {value}
+      </label>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        name={name}
+        defaultValue={current || min}
+        onChange={(event) => {
+          setValue(Number(event.target.value));
+          exec(Number(event.target.value));
+        }}
+      />
+    </div>
+  );
+}
+
+let stressLevel = 0;
+function stress(level: number) {
+  stressLevel = level;
+  const collection = Array.from({ length: stressLevel * 5 }).map(() => {
+    const div = document.createElement("div");
+    div.style.width = "1px";
+    div.style.height = "1px";
+    div.style.opacity = "0.01";
+    div.style.position = "absolute";
+    document.body.appendChild(div);
+    return div;
+  });
+  requestAnimationFrame(() => {
+    collection.forEach((div) => {
+      div.parentElement?.removeChild(div);
+    });
+
+    if (stressLevel > 0) {
+      stress(stressLevel);
+    }
+  });
+}
+
+function range(from: number, to: number) {
+  return {
+    [Symbol.iterator]: function* () {
+      for (let i = from; i <= to; i++) {
+        yield i;
+      }
+    },
+  };
 }
 
 export default Demo;
