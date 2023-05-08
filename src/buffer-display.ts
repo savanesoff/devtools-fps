@@ -10,7 +10,7 @@ const timing = {
 const style = {
   x: 0,
   marginTop: 24,
-  minimumSliceHeight: 0.5,
+  minimumSliceHeight: 0.2,
 };
 
 /**
