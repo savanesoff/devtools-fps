@@ -2,7 +2,7 @@ import { CONFIG, State } from ".";
 import { getFPSColor } from "./colors";
 
 const timing = {
-  interval: 1000 / 20, // 10 times per second
+  interval: 1000 / 10, // 10 times per second
   last: 0,
   initialDraw: false,
 };
