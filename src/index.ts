@@ -9,7 +9,7 @@ declare global {
 
 export const CONFIG = {
   maxFPS: 60,
-  width: 180,
+  width: innerWidth / 3,
   height: 50,
   top: 0,
   left: 0,
@@ -130,7 +130,7 @@ export function setBufferSize(size: number) {
  * Start rendering the FPS monitor
  *
  */
-export function config({
+export default function config({
   bufferSize = 0,
   style = {} as Omit<Partial<CSSStyleDeclaration>, "width" | "height">,
   width = CONFIG.width,
@@ -158,6 +158,7 @@ function update() {
 function onFrame(force = false) {
   computeState();
   if (!state.inspect && state.render) renderCanvas(state, buffers.fps, force);
+  if (state.inspect) renderCanvas(state, buffers.fpsSnapshot, force);
 }
 
 /**
