@@ -96,11 +96,10 @@ export function setSize({
 export function setBufferSize(size: number) {
   buffers.times = new Float32Array(size).map(
     (_, i) =>
-      buffers.times[i - (size - buffers.times.length || 0)] || buffers.times[0]
+      buffers.times[i - (size - buffers.times.length)] || buffers.times[0]
   );
   buffers.fps = new Float32Array(size).map(
-    (_, i) =>
-      buffers.fps[i - (size - buffers.fps.length || 0)] || buffers.fps[0]
+    (_, i) => buffers.fps[i - (size - buffers.fps.length)] || buffers.fps[0]
   );
 }
 /**
