@@ -94,11 +94,7 @@ export default class DevtoolsFPS {
   }
 
   drawCurrent() {
-    this.display.renderCurrent(
-      this.mouseState.rect,
-      this.fps.fps,
-      this.inspect
-    );
+    this.display.renderCurrent(this.mouseState.rect, this.inspect);
   }
 
   draw() {

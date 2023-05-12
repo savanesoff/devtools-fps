@@ -39,7 +39,7 @@ export default class Display {
     this.bufferDisplay = new BufferDisplay(this.ctx, maxFPS);
   }
 
-  renderStateIcon(pause = false, fps: number) {
+  renderStateIcon(pause = false) {
     if (pause) {
       this.ctx.fillStyle = getFPSColor(0);
       this.ctx.clearRect(this.canvas.width - 20, 5, 20, 15);
@@ -139,10 +139,10 @@ export default class Display {
     }
   }
 
-  renderCurrent(rect: DOMRect, fps: number, pause = false) {
+  renderCurrent(rect: DOMRect, pause = false) {
     this.fpsDisplay.renderCurrent(rect);
     this.bufferDisplay.renderCurrent(rect);
-    this.renderStateIcon(pause, fps);
+    this.renderStateIcon(pause);
   }
 
   update(
@@ -156,7 +156,7 @@ export default class Display {
   ) {
     this.fpsDisplay.update(now, rect, fps, average);
     this.bufferDisplay.update(now, rect, buffer);
-    this.renderStateIcon(pause, fps);
+    this.renderStateIcon(pause);
     this.renderControlPoints(rect, controlPoints);
   }
 }
