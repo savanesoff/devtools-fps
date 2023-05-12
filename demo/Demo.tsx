@@ -1,89 +1,116 @@
 import React from "react";
+import devtoolsFPS from "../src";
+import "./Demo.css";
 import { useDevtoolsFPS } from "./useDevtoolsFPS";
+// customize the devtools-fps panel
+devtoolsFPS.config({
+  bufferSize: window.innerWidth,
+  width: window.innerWidth,
+  height: 200,
+  style: {
+    backgroundColor: "rgba(0,0,30,0.5)",
+    opacity: "0.9",
+  },
+});
 
 function Demo() {
-  const { state, toggleRender, toggleRun, setSize, setBufferSize } =
-    useDevtoolsFPS();
+  const { devtoolsFPS } = useDevtoolsFPS();
   return (
     <div>
-      <h1>devtools-fps</h1>
+      <h1>
+        Demo: <span className="brand">devtools-fps</span>
+      </h1>
       <div>
-        <p>Controls</p>
-        {Object.entries(state).map(([key, value]) => (
-          <div key={key}>
-            {" "}
-            {key}: {value.toString()}{" "}
+        <div className="info-block">
+          <p>Data</p>
+          <div>fps: {devtoolsFPS.fps.fps}</div>
+          <div>average: {devtoolsFPS.fps.averageFPS}</div>
+        </div>
+        <div className="info-block">
+          <h3>Controls</h3>
+          <div className="controls-container">
+            <button
+              onClick={() => devtoolsFPS.toggleRun()}
+              style={{
+                backgroundColor: !devtoolsFPS.run ? "pink" : "lightgreen",
+              }}
+            >
+              {devtoolsFPS.run ? "Stop" : "Start"}
+            </button>
+
+            <Range
+              exec={(value) => {
+                devtoolsFPS.config({ bufferSize: value });
+              }}
+              min={100}
+              max={window.innerWidth}
+              name="Buffer Size"
+              current={devtoolsFPS.fps.buffers.fps.length}
+            />
+
+            <Range
+              exec={stress}
+              min={0}
+              max={100}
+              name="Stress level %"
+              current={0}
+            />
           </div>
-        ))}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-around",
-            width: "100%",
-            alignItems: "center",
-          }}
-        >
-          <button
-            onClick={toggleRender}
-            style={{
-              backgroundColor: !state.render ? "pink" : "lightgreen",
-            }}
-          >
-            {state.render ? "Stop Rendering" : "Start Rendering"}
-          </button>
-          <button
-            onClick={toggleRun}
-            style={{
-              backgroundColor: !state.run ? "pink" : "lightgreen",
-            }}
-          >
-            {state.run ? "Stop Running" : "Start Running"}
-          </button>
+        </div>
+        <div className="info-block">
+          <h3>Info</h3>
+          <p>
+            Devtools-fps starts running as soon as you import the "module". No
+            additional configurations required, however you can set defaults,
+            see below, or click{" "}
+            <a
+              style={{
+                color: "lightblue",
+              }}
+              href="https://github.com/savanesoff/devtools-fps#readme"
+            >
+              here for more info
+            </a>
+          </p>
+          <ol>
+            <li>
+              Use your cursor to drag the{" "}
+              <span className="brand">devtools-fps</span> to the desired
+              location
+            </li>
+            <li>
+              Click on <span className="brand">devtools-fps</span> to toggle
+              "INSPECT" mode
+              <ol>
+                <li>
+                  While in "INSPECT" mode, you can see tooltip with buffer FPS
+                  and time origin of the event. Use it to find out what is
+                  causing the FPS drop.
+                </li>
+              </ol>
+            </li>
+            <li>
+              Use your cursor to resize{" "}
+              <span className="brand">devtools-fps</span> however you need
+            </li>
 
-          <Range
-            exec={(value) => {
-              setSize({
-                width: value,
-              });
-            }}
-            min={100}
-            max={window.innerWidth}
-            name="Width"
-            current={200}
-          />
-          <Range
-            exec={(value) => {
-              setSize({
-                height: value,
-              });
-            }}
-            min={100}
-            max={500}
-            name="Height"
-            current={200}
-          />
-
-          <Range
-            exec={setBufferSize}
-            min={100}
-            max={window.innerWidth}
-            name="Buffer Size"
-            current={200}
-          />
-
-          <Range
-            exec={stress}
-            min={0}
-            max={100}
-            name="Stress level %"
-            current={0}
-          />
+            <li>
+              Use "devtoolFPS.config()" to set:{" "}
+              <ol>
+                <li>bufferSize: number</li>
+                <li>width: number</li>
+                <li>height: number</li>
+                <li>style: CSSProperties</li>
+              </ol>
+            </li>
+          </ol>
         </div>
       </div>
     </div>
   );
 }
+
+// Range component
 function Range({
   exec,
   name,
@@ -99,13 +126,7 @@ function Range({
 }) {
   const [value, setValue] = React.useState(current || min);
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-around",
-      }}
-    >
+    <div className="range-container">
       <label htmlFor={name}>
         {name}: {value}
       </label>
@@ -125,6 +146,8 @@ function Range({
 }
 
 let stressLevel = 0;
+
+// induce stress on the browser
 function stress(level: number) {
   stressLevel = level;
   const collection = Array.from({ length: stressLevel * 5 }).map(() => {
@@ -145,16 +168,6 @@ function stress(level: number) {
       stress(stressLevel);
     }
   });
-}
-
-function range(from: number, to: number) {
-  return {
-    [Symbol.iterator]: function* () {
-      for (let i = from; i <= to; i++) {
-        yield i;
-      }
-    },
-  };
 }
 
 export default Demo;
