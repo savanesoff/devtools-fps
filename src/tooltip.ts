@@ -1,11 +1,5 @@
 import { getFPSColor } from "./colors";
 
-declare global {
-  interface Window {
-    devtools_fps_tooltip: HTMLDivElement | null;
-  }
-}
-
 const TIME_FORMAT: Intl.DateTimeFormatOptions = {
   hour: "2-digit",
   minute: "numeric",
@@ -30,52 +24,75 @@ const style = {
   pointerEvents: "none",
 };
 
-function getTooltip(window: Window): HTMLDivElement {
-  const tooltip = window.devtools_fps_tooltip || createTooltip();
-  if (!tooltip.parentElement) {
-    document.body.appendChild(tooltip);
+export default class Tooltip {
+  tooltip: HTMLDivElement;
+  bufferFPS: Float32Array;
+  bufferTimes: Float32Array;
+  canvas: HTMLCanvasElement;
+
+  constructor(
+    canvas: HTMLCanvasElement,
+    bufferFPS: Float32Array,
+    bufferTimes: Float32Array
+  ) {
+    this.tooltip = canvas.ownerDocument.createElement("div");
+    this.tooltip.id = "devtools-fps-tooltip";
+    this.canvas = canvas;
+    this.bufferFPS = bufferFPS;
+    this.bufferTimes = bufferTimes;
+    // @ts-ignore-next-line
+    Object.assign(this.tooltip.style, style);
+    this.canvas.addEventListener("mouseenter", this.onMouseEnter);
+    this.canvas.addEventListener("mouseleave", this.onMouseLeave);
+    this.canvas.addEventListener("mousemove", this.onMouseMove);
+    window.document.body.appendChild(this.tooltip);
   }
 
-  window.devtools_fps_tooltip = tooltip;
-  return tooltip;
-}
-
-function createTooltip() {
-  const tooltip = document.createElement("div");
-  tooltip.id = "devtools-fps-tooltip";
-  // @ts-ignore-next-line
-  Object.assign(tooltip.style, style);
-  return tooltip;
-}
-
-function setTooltipPosition(tooltip: HTMLElement, e: MouseEvent) {
-  const width = tooltip.offsetWidth;
-  const height = tooltip.offsetHeight;
-
-  const top = e.clientY - height < 0 ? 0 : e.clientY - height;
-  const left =
-    e.clientX + width > window.innerWidth
-      ? window.innerWidth - width
-      : e.clientX;
-  tooltip.style.left = `${left}px`;
-  tooltip.style.top = `${top}px`;
-}
-
-export function renderTooltip(e: MouseEvent, fps: number, timestamp: number) {
-  const tooltip = getTooltip(e.view || window);
-  const time = new Date(performance.timeOrigin + timestamp).toLocaleTimeString(
-    "en-US",
-    TIME_FORMAT
-  );
-  tooltip.innerText = `${fps.toFixed(1)} fps\n${time}`;
-  setTooltipPosition(tooltip, e);
-  tooltip.style.color = getFPSColor(fps);
-}
-
-export function removeTooltip() {
-  const tooltip = window.devtools_fps_tooltip;
-  if (tooltip && tooltip.parentElement) {
-    tooltip.parentElement.removeChild(tooltip);
+  destroy() {
+    this.canvas.removeEventListener("mouseenter", this.onMouseEnter);
+    this.canvas.removeEventListener("mouseleave", this.onMouseLeave);
+    this.canvas.removeEventListener("mousemove", this.onMouseMove);
+    this.tooltip.remove();
   }
-  window.devtools_fps_tooltip = null;
+
+  private onMouseEnter = (e: MouseEvent) => {
+    window.document.body.appendChild(this.tooltip);
+    this.onMouseMove(e);
+  };
+
+  private onMouseLeave = () => {
+    this.tooltip.remove();
+  };
+
+  update(x: number, y: number) {
+    const rect = this.canvas.getBoundingClientRect();
+    const xPositionWithinCanvas = x - rect.left;
+    const bufferValueIndex = Math.floor(
+      (xPositionWithinCanvas / rect.width) * this.bufferFPS.length
+    );
+    const fps = this.bufferFPS[bufferValueIndex];
+    const timestamp = this.bufferTimes[bufferValueIndex];
+    this.render(fps, timestamp, x, y);
+  }
+
+  private onMouseMove = (e: MouseEvent) => {
+    this.update(e.clientX, e.clientY);
+  };
+
+  private render(fps: number, timestamp: number, x: number, y: number) {
+    const time = new Date(
+      performance.timeOrigin + timestamp
+    ).toLocaleTimeString("en-US", TIME_FORMAT);
+    this.tooltip.innerText = `${fps.toFixed(1)} fps\n${time}`;
+    this.tooltip.style.color = getFPSColor(fps);
+    // get rect only after text is set
+    const rect = this.tooltip.getBoundingClientRect();
+    // ensure tooltip is within window bounds
+    const top = y - rect.height < 0 ? 0 : y - rect.height;
+    const left =
+      x + rect.width > window.innerWidth ? window.innerWidth - rect.width : x;
+    // set tooltip position
+    this.tooltip.style.left = `${left}px`;
+    this.tooltip.style.top = `${top}px`;
+  }
 }

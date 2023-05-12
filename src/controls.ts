@@ -1,12 +1,9 @@
 import { EventEmitter } from "events";
-import { buffers, state } from ".";
-import { renderCanvas, setDisplayState } from "./display";
 import StateMouse from "./state-mouse";
-import { removeTooltip, renderTooltip } from "./tooltip";
 
 export default class Controls extends EventEmitter {
-  state: StateMouse | null = null;
-  canvas: HTMLCanvasElement | null = null;
+  mouse: StateMouse;
+  canvas: HTMLCanvasElement;
   snapThreshold = 20;
   window: Window = window;
   border = {
@@ -17,156 +14,149 @@ export default class Controls extends EventEmitter {
   };
   minHeight = 50;
   minWidth = 150;
-  inspecting = false;
 
-  static instance: Controls;
-
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, mouse: StateMouse) {
     super();
-    if (Controls.instance) {
-      return Controls.instance;
-    }
     this.canvas = canvas;
     this.window = canvas.ownerDocument?.defaultView || window;
-    this.state = new StateMouse(canvas);
-    this.state.on("update", this.onStateUpdate.bind(this));
-    this.state.on("click", this.onClick.bind(this));
-    Controls.instance = this;
+    this.mouse = mouse;
+    this.mouse.on("update", this.onStateUpdate.bind(this));
   }
 
-  onClick(state: StateMouse) {
-    if (!this.canvas) return;
-    this.inspecting = !this.inspecting;
+  onStateUpdate() {
+    this.updateCursorStyle();
+    if (this.mouse.dragging) {
+      this.drag();
+    } else if (!this.mouse.down) {
+      this.activeControlPoints();
+    } else if (this.mouse.down) {
+      this.reSize();
+    }
+    this.emit("update", this.mouse);
   }
 
-  onStateUpdate(state: StateMouse) {
-    this.updateCursorStyle(state);
-    if (state.dragging) {
-      this.drag(state.pageX - state.offsetX, state.pageY - state.offsetY);
-    } else if (!state.down) {
-      this.activeControlPoints(state);
-    } else if (state.down) {
-      this.reSize(state);
+  reSize() {
+    if (this.mouse.controlPoints.top) {
+      this.movePointTop();
     }
-    this.emit("update", state);
-  }
-
-  reSize(state: StateMouse) {
-    if (!this.canvas) return;
-    if (state.controlPoints.top) {
-      this.movePointTop(state);
+    if (this.mouse.controlPoints.bottom) {
+      this.movePointBottom();
     }
-    if (state.controlPoints.bottom) {
-      this.movePointBottom(state);
+    if (this.mouse.controlPoints.left) {
+      this.movePointLeft();
     }
-    if (state.controlPoints.left) {
-      this.movePointLeft(state);
-    }
-    if (state.controlPoints.right) {
-      this.movePointRight(state);
+    if (this.mouse.controlPoints.right) {
+      this.movePointRight();
     }
   }
 
-  private movePointRight(state: StateMouse) {
-    if (!this.canvas) return;
+  private movePointRight() {
     this.canvas.width = Math.max(
       this.minWidth,
       Math.min(
-        state.pageX -
-          state.startRect.left +
-          state.startRect.width -
-          state.offsetX,
-        this.window.innerWidth - state.startRect.left
+        this.mouse.pageX -
+          this.mouse.startRect.left +
+          this.mouse.startRect.width -
+          this.mouse.offsetX,
+        this.window.innerWidth - this.mouse.startRect.left
       )
     );
   }
 
-  private movePointLeft(state: StateMouse) {
-    if (!this.canvas) return;
+  private movePointLeft() {
     const left = Math.max(
       0,
       Math.min(
-        state.pageX - state.offsetX,
-        state.startRect.right - this.minWidth
+        this.mouse.pageX - this.mouse.offsetX,
+        this.mouse.startRect.right - this.minWidth
       )
     );
 
-    this.canvas.width = Math.max(this.minWidth, state.startRect.right - left);
+    this.canvas.width = Math.max(
+      this.minWidth,
+      this.mouse.startRect.right - left
+    );
     this.canvas.style.left = `${left}px`;
   }
 
-  private movePointBottom(state: StateMouse) {
-    if (!this.canvas) return;
+  private movePointBottom() {
     this.canvas.height = Math.max(
       this.minHeight,
       Math.min(
-        state.pageY -
-          state.startRect.top +
-          state.startRect.height -
-          state.offsetY,
-        this.window.innerHeight - state.startRect.top
+        this.mouse.pageY -
+          this.mouse.startRect.top +
+          this.mouse.startRect.height -
+          this.mouse.offsetY,
+        this.window.innerHeight - this.mouse.startRect.top
       )
     );
   }
 
-  private movePointTop(state: StateMouse) {
-    if (!this.canvas) return;
+  private movePointTop() {
     const top = Math.max(
       0,
       Math.min(
-        state.pageY - state.offsetY,
-        state.startRect.bottom - this.minHeight
+        this.mouse.pageY - this.mouse.offsetY,
+        this.mouse.startRect.bottom - this.minHeight
       )
     );
 
-    this.canvas.height = Math.max(this.minHeight, state.startRect.bottom - top);
+    this.canvas.height = Math.max(
+      this.minHeight,
+      this.mouse.startRect.bottom - top
+    );
     this.canvas.style.top = `${top}px`;
   }
 
-  activeControlPoints(state: StateMouse) {
-    if (!this.canvas) return;
+  activeControlPoints() {
     const shadow = [
-      state.controlPoints.top
+      this.mouse.controlPoints.top
         ? `0 ${this.border.width}px ${this.border.blur}px ${this.border.spread}px ${this.border.color} inset`
         : null,
-      state.controlPoints.bottom
+      this.mouse.controlPoints.bottom
         ? `0 ${this.border.width}px ${this.border.blur}px ${this.border.spread}px ${this.border.color}`
         : null,
-      state.controlPoints.left
+      this.mouse.controlPoints.left
         ? `${this.border.width}px 0 ${this.border.blur}px ${this.border.spread}px ${this.border.color} inset`
         : null,
-      state.controlPoints.right
+      this.mouse.controlPoints.right
         ? `${this.border.width}px 0 ${this.border.blur}px ${this.border.spread}px ${this.border.color}`
         : null,
     ];
     this.canvas.style.boxShadow = shadow.filter((v) => v).join(", ");
   }
 
-  private updateCursorStyle(state: StateMouse) {
-    if (!this.canvas) return;
+  private updateCursorStyle() {
     if (
-      (state.controlPoints.left && state.controlPoints.top) ||
-      (state.controlPoints.right && state.controlPoints.bottom)
+      (this.mouse.controlPoints.left && this.mouse.controlPoints.top) ||
+      (this.mouse.controlPoints.right && this.mouse.controlPoints.bottom)
     ) {
       this.window.document.body.style.cursor = "nwse-resize";
     } else if (
-      (state.controlPoints.left && state.controlPoints.bottom) ||
-      (state.controlPoints.right && state.controlPoints.top)
+      (this.mouse.controlPoints.left && this.mouse.controlPoints.bottom) ||
+      (this.mouse.controlPoints.right && this.mouse.controlPoints.top)
     ) {
       this.window.document.body.style.cursor = "nesw-resize";
-    } else if (state.controlPoints.top || state.controlPoints.bottom) {
+    } else if (
+      this.mouse.controlPoints.top ||
+      this.mouse.controlPoints.bottom
+    ) {
       this.window.document.body.style.cursor = "ns-resize";
-    } else if (state.controlPoints.left || state.controlPoints.right) {
+    } else if (
+      this.mouse.controlPoints.left ||
+      this.mouse.controlPoints.right
+    ) {
       this.window.document.body.style.cursor = "ew-resize";
-    } else if (state.over) {
+    } else if (this.mouse.over) {
       this.window.document.body.style.cursor = "pointer";
     } else {
       this.window.document.body.style.cursor = "default";
     }
   }
 
-  drag(x: number, y: number) {
-    if (!this.canvas) return;
+  drag() {
+    const x = this.mouse.pageX - this.mouse.offsetX;
+    const y = this.mouse.pageY - this.mouse.offsetY;
     // snap to the edges of the window
     const left =
       x < this.snapThreshold
@@ -184,52 +174,4 @@ export default class Controls extends EventEmitter {
     this.canvas.style.left = left + "px";
     this.canvas.style.top = top + "px";
   }
-}
-
-function onInspectModeOn(e: MouseEvent) {
-  const canvas = e.target as HTMLCanvasElement;
-  // stop rendering, but keep updating the buffers
-  state.render = false;
-  state.inspect = true;
-  setDisplayState(state);
-  // create a snapshot of the buffers
-  buffers.fpsSnapshot = new Float32Array(buffers.fps);
-  buffers.timesSnapshot = new Float32Array(buffers.times);
-
-  renderCanvas(state, buffers.fpsSnapshot);
-  // add event listeners to the canvas
-
-  //   canvas.addEventListener("mousemove", onMouseOver);
-  canvas.addEventListener("mouseout", removeTooltip);
-  // render the tooltip for the current mouse position
-  onMouseOver(e);
-}
-
-function onInspectModeOff(e: MouseEvent) {
-  const canvas = e.target as HTMLCanvasElement;
-
-  state.render = true;
-  state.inspect = false;
-
-  setDisplayState(state);
-
-  //   canvas.removeEventListener("mousemove", onMouseOver);
-  canvas.removeEventListener("mouseout", removeTooltip);
-
-  removeTooltip();
-}
-
-const moveState = {
-  hitStatus: null as ReturnType<typeof getHitStatus> | null,
-};
-
-function updateTooltip(e: MouseEvent) {
-  const canvas = e.target as HTMLCanvasElement;
-  const xPositionWithinCanvas = e.clientX - canvas.offsetLeft;
-  const bufferValueIndex = Math.floor(
-    (xPositionWithinCanvas / canvas.width) * buffers.fpsSnapshot.length
-  );
-  const fps = buffers.fpsSnapshot[bufferValueIndex];
-  const timestamp = buffers.timesSnapshot[bufferValueIndex];
-  renderTooltip(e, fps, timestamp);
 }

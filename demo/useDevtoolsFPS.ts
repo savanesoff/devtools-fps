@@ -1,18 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-  setBufferSize,
-  setSize,
-  state,
-  toggleRender,
-  toggleRun,
-} from "../src/index";
+import devtoolsFPS from "../src/index";
 
 export function useDevtoolsFPS(): {
-  state: typeof state;
-  toggleRun: typeof toggleRun;
-  toggleRender: typeof toggleRender;
-  setSize: typeof setSize;
-  setBufferSize: typeof setBufferSize;
+  devtoolsFPS: typeof devtoolsFPS;
   _: boolean;
 } {
   const [trigger, setTrigger] = useState(false);
@@ -23,11 +13,7 @@ export function useDevtoolsFPS(): {
     }, 200);
   }, [trigger]);
   return {
-    setBufferSize,
-    setSize,
-    state,
-    toggleRender,
-    toggleRun,
+    devtoolsFPS,
     _: trigger,
   };
 }

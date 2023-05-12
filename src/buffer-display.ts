@@ -1,54 +1,63 @@
-import { CONFIG, State } from ".";
 import { getFPSColor } from "./colors";
 
-const timing = {
-  interval: 1000 / 20, // 10 times per second
-  last: 0,
-  initialDraw: false,
-};
-
 const style = {
-  x: 0,
   marginTop: 24,
   minimumSliceHeight: 0.2,
 };
 
-/**
- * Renders graph, but not the FPS values
- */
-export function renderBuffer(
-  canvas: HTMLCanvasElement,
-  state: State,
-  buffer: Float32Array,
-  force = false
-) {
-  if (!canvas.ctx || (!force && state.now - timing.last < timing.interval)) {
-    return;
+export default class BufferDisplay {
+  updateInterval = 1000 / 30;
+  ctx: CanvasRenderingContext2D;
+  lastUpdatedAt = 0;
+  maxFPS: number;
+  buffer: Float32Array = new Float32Array(0);
+
+  constructor(ctx: CanvasRenderingContext2D, maxFPS: number) {
+    this.ctx = ctx;
+    this.maxFPS = maxFPS;
   }
-  timing.last = state.now;
 
-  canvas.ctx.clearRect(
-    0,
-    style.marginTop,
-    canvas.width,
-    canvas.height - style.marginTop
-  );
-  let sliceWidth = (canvas.width * 1.0) / buffer.length;
-  let x = 0;
-
-  for (let i = 0; i < buffer.length; i++) {
-    const sliceY =
-      canvas.height -
-      Math.max(style.minimumSliceHeight, buffer[i] / CONFIG.maxFPS) *
-        (canvas.height - style.marginTop);
-
-    canvas.ctx.fillStyle = getFPSColor(buffer[i]);
-    canvas.ctx.fillRect(
-      x,
-      sliceY,
-      Math.ceil(sliceWidth),
-      canvas.height - sliceY
+  clear(rect: DOMRect) {
+    this.ctx.clearRect(
+      0,
+      style.marginTop,
+      rect.width,
+      rect.height - style.marginTop
     );
-    x += sliceWidth;
+  }
+
+  render(rect: DOMRect) {
+    // clear area
+    this.clear(rect);
+    // render slices
+    let sliceWidth = rect.width / this.buffer.length;
+    const maxSliceHeight = rect.height - style.marginTop;
+    const minSliceHeight = maxSliceHeight * style.minimumSliceHeight;
+    let x = 0;
+    // draw slices
+    for (let i = 0; i < this.buffer.length; i++) {
+      const sliceHeight = Math.max(
+        minSliceHeight,
+        Math.min(1, this.buffer[i] / this.maxFPS) * maxSliceHeight
+      );
+      const sliceY = rect.height - sliceHeight;
+
+      this.ctx.fillStyle = getFPSColor(this.buffer[i]);
+      this.ctx.fillRect(x, sliceY, Math.ceil(sliceWidth), sliceHeight);
+      x += sliceWidth;
+    }
+  }
+
+  renderCurrent(rect: DOMRect) {
+    this.render(rect);
+  }
+
+  update(now: number, rect: DOMRect, buffer: Float32Array) {
+    if (this.lastUpdatedAt && now - this.lastUpdatedAt < this.updateInterval) {
+      return;
+    }
+    this.lastUpdatedAt = now;
+    this.buffer = buffer;
+    this.render(rect);
   }
 }
