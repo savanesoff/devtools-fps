@@ -19,7 +19,6 @@ const style = {
   left: "auto",
   right: "0",
   backgroundColor: "rgba(0,0,0,0.2)",
-  cursor: "pointer",
   zIndex: "999999",
 };
 

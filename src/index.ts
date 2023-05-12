@@ -1,4 +1,4 @@
-import { startControls } from "./controls";
+import Controls from "./controls";
 import { getCanvas, renderCanvas } from "./display";
 
 declare global {
@@ -99,20 +99,20 @@ export function setSize({
     window.innerHeight / 3
   );
 
-  const rect = canvas.getBoundingClientRect();
-  const left =
-    rect.right > window.innerWidth
-      ? window.innerWidth - canvas.width
-      : canvas.style.left || 0;
+  // const rect = canvas.getBoundingClientRect();
+  // const left =
+  //   rect.right > window.innerWidth
+  //     ? window.innerWidth - canvas.width
+  //     : canvas.style.left || 0;
 
-  canvas.style.left = left + "px";
+  // canvas.style.left = left + "px";
 
-  const top =
-    rect.bottom > window.innerHeight
-      ? window.innerHeight - canvas.height
-      : canvas.style.top || 0;
+  // const top =
+  //   rect.bottom > window.innerHeight
+  //     ? window.innerHeight - canvas.height
+  //     : canvas.style.top || 0;
 
-  canvas.style.top = top + "px";
+  // canvas.style.top = top + "px";
   onFrame(true);
 }
 
@@ -142,7 +142,8 @@ export default function config({
   // assign styles
   (<any>Object).assign(canvas.style, style);
 
-  canvas.addEventListener("mousedown", startControls, true);
+  const controls = new Controls(canvas);
+  controls.on("update", () => onFrame(true));
   setBufferSize(bufferSize);
 }
 
