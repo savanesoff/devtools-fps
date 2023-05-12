@@ -27,8 +27,6 @@ export default class Controls extends EventEmitter {
     this.updateCursorStyle();
     if (this.mouse.dragging) {
       this.drag();
-    } else if (!this.mouse.down) {
-      this.activeControlPoints();
     } else if (this.mouse.down) {
       this.reSize();
     }
@@ -106,24 +104,6 @@ export default class Controls extends EventEmitter {
       this.mouse.startRect.bottom - top
     );
     this.canvas.style.top = `${top}px`;
-  }
-
-  activeControlPoints() {
-    const shadow = [
-      this.mouse.controlPoints.top
-        ? `0 ${this.border.width}px ${this.border.blur}px ${this.border.spread}px ${this.border.color} inset`
-        : null,
-      this.mouse.controlPoints.bottom
-        ? `0 ${this.border.width}px ${this.border.blur}px ${this.border.spread}px ${this.border.color}`
-        : null,
-      this.mouse.controlPoints.left
-        ? `${this.border.width}px 0 ${this.border.blur}px ${this.border.spread}px ${this.border.color} inset`
-        : null,
-      this.mouse.controlPoints.right
-        ? `${this.border.width}px 0 ${this.border.blur}px ${this.border.spread}px ${this.border.color}`
-        : null,
-    ];
-    this.canvas.style.boxShadow = shadow.filter((v) => v).join(", ");
   }
 
   private updateCursorStyle() {

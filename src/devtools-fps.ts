@@ -112,7 +112,8 @@ export default class DevtoolsFPS {
       this.fps.fps,
       this.fps.averageFPS,
       buffer,
-      this.inspect
+      this.inspect,
+      this.mouseState.controlPoints
     );
   }
 

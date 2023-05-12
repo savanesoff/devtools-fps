@@ -1,6 +1,7 @@
 import BufferDisplay from "./buffer-display";
 import { getFPSColor } from "./colors";
 import FPSDisplay from "./fps-display";
+import StateMouse from "./state-mouse";
 
 const style = {
   position: "absolute",
@@ -8,7 +9,7 @@ const style = {
   bottom: "0",
   left: "auto",
   right: "0",
-  backgroundColor: "rgba(0,0,0,0.2)",
+  backgroundColor: "rgba(0,0,30,0.5)",
   zIndex: "999999",
 };
 
@@ -17,6 +18,8 @@ export default class Display {
   ctx: CanvasRenderingContext2D;
   fpsDisplay: FPSDisplay;
   bufferDisplay: BufferDisplay;
+  controlPointWidth = 3;
+  controlPointLength = 40;
   constructor(
     canvas: HTMLCanvasElement,
     width: number,
@@ -57,6 +60,85 @@ export default class Display {
     }
   }
 
+  /**
+   * Draw active control points
+   * @param rect
+   * @param controlPoints
+   */
+  renderControlPoints(
+    rect: DOMRect,
+    controlPoints: StateMouse["controlPoints"]
+  ) {
+    const color = getFPSColor(0);
+    this.ctx.fillStyle = color;
+
+    if (controlPoints.top && controlPoints.right) {
+      // draw corner activation
+      this.ctx.fillRect(
+        rect.width - this.controlPointLength,
+        0,
+        this.controlPointLength,
+        this.controlPointWidth
+      );
+      this.ctx.fillRect(
+        rect.width - this.controlPointWidth,
+        0,
+        this.controlPointWidth,
+        this.controlPointLength
+      );
+    } else if (controlPoints.top && controlPoints.left) {
+      // draw corner activation
+      this.ctx.fillRect(0, 0, this.controlPointLength, this.controlPointWidth);
+      this.ctx.fillRect(0, 0, this.controlPointWidth, this.controlPointLength);
+    } else if (controlPoints.bottom && controlPoints.left) {
+      this.ctx.fillRect(
+        0,
+        rect.height - this.controlPointLength,
+        this.controlPointWidth,
+        this.controlPointLength
+      );
+      this.ctx.fillRect(
+        0,
+        rect.height - this.controlPointWidth,
+        this.controlPointLength,
+        this.controlPointWidth
+      );
+    } else if (controlPoints.bottom && controlPoints.right) {
+      this.ctx.fillRect(
+        rect.width - this.controlPointLength,
+        rect.height - this.controlPointWidth,
+        this.controlPointLength,
+        this.controlPointWidth
+      );
+      this.ctx.fillRect(
+        rect.width - this.controlPointWidth,
+        rect.height - this.controlPointLength,
+        this.controlPointWidth,
+        this.controlPointLength
+      );
+    } else if (controlPoints.top) {
+      // draw top activation
+      this.ctx.fillRect(0, 0, rect.width, this.controlPointWidth);
+    } else if (controlPoints.right) {
+      // draw right activation
+      this.ctx.fillRect(
+        rect.width - this.controlPointWidth,
+        0,
+        this.controlPointWidth,
+        rect.height
+      );
+    } else if (controlPoints.bottom) {
+      this.ctx.fillRect(
+        0,
+        rect.height - this.controlPointWidth,
+        rect.width,
+        this.controlPointWidth
+      );
+    } else if (controlPoints.left) {
+      this.ctx.fillRect(0, 0, this.controlPointWidth, rect.height);
+    }
+  }
+
   renderCurrent(rect: DOMRect, fps: number, pause = false) {
     this.fpsDisplay.renderCurrent(rect);
     this.bufferDisplay.renderCurrent(rect);
@@ -69,10 +151,12 @@ export default class Display {
     fps: number,
     average: number,
     buffer: Float32Array,
-    pause = false
+    pause = false,
+    controlPoints: StateMouse["controlPoints"]
   ) {
     this.fpsDisplay.update(now, rect, fps, average);
     this.bufferDisplay.update(now, rect, buffer);
     this.renderStateIcon(pause, fps);
+    this.renderControlPoints(rect, controlPoints);
   }
 }
