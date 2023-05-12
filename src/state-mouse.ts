@@ -31,7 +31,7 @@ export default class StateMouse extends EventEmitter {
     this.onDown = this.onDown.bind(this);
     this.onUp = this.onUp.bind(this);
     this.canvas.ownerDocument.addEventListener("mousemove", this.onMove);
-    this.canvas.addEventListener("mousedown", this.onDown);
+    this.canvas.ownerDocument.addEventListener("mousedown", this.onDown);
   }
 
   private onMove(e: MouseEvent) {
@@ -49,6 +49,9 @@ export default class StateMouse extends EventEmitter {
   }
 
   private onDown(e: MouseEvent) {
+    if (!this.over) {
+      return;
+    }
     e.preventDefault();
     this.down = true;
     this.startRect = this.rect;
