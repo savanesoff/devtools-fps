@@ -18,7 +18,7 @@ export default class Display {
   ctx: CanvasRenderingContext2D;
   fpsDisplay: FPSDisplay;
   bufferDisplay: BufferDisplay;
-  controlPointWidth = 3;
+  controlPointWidth = 4;
   controlPointLength = 40;
   constructor(
     canvas: HTMLCanvasElement,
@@ -46,8 +46,8 @@ export default class Display {
       this.ctx.fillRect(this.canvas.width - 20, 5, 6, 15);
       this.ctx.fillRect(this.canvas.width - 10, 5, 6, 15);
 
-      this.canvas.style.outline = `1px solid ${getFPSColor(fps)}`;
-      this.canvas.style.outlineOffset = "-1px";
+      this.canvas.style.outline = `2px solid ${getFPSColor(0)}`;
+      this.canvas.style.outlineOffset = "-2px";
     } else {
       this.ctx.fillStyle = getFPSColor(60);
       // draw play icon
@@ -69,7 +69,7 @@ export default class Display {
     rect: DOMRect,
     controlPoints: StateMouse["controlPoints"]
   ) {
-    const color = getFPSColor(0);
+    const color = getFPSColor(30);
     this.ctx.fillStyle = color;
 
     if (controlPoints.top && controlPoints.right) {
