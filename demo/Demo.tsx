@@ -4,12 +4,13 @@ import "./Demo.css";
 import { useDevtoolsFPS } from "./useDevtoolsFPS";
 // customize the devtools-fps panel
 devtoolsFPS.config({
-  bufferSize: window.innerWidth,
-  width: window.innerWidth,
+  bufferSize: window.innerWidth / 2,
+  width: window.innerWidth / 2,
   height: 200,
   style: {
     backgroundColor: "rgba(0,0,30,0.5)",
     opacity: "0.9",
+    left: window.innerWidth / 4 + "px",
   },
 });
 
