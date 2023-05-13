@@ -6,7 +6,7 @@
 
 # Why? 🙃
 
-In order to monitor FPS without other processes running at the same time (browser devtools), but also while application is rendered at full screen. `devtools-fps` allows you to interact with it by pausing recording and inspecting specific frame performance and time the frame was rendered at.
+In order to monitor FPS without other processes running at the same time (browser devtools), but also while application is rendered at full screen. `devtools-fps` allows you to interact with it by pausing "recording" and inspecting a snapshot of a buffer for a specific frame performance and time the frame was rendered at.
 
 # Install
 
@@ -24,27 +24,27 @@ npm install -D devtools-fps
 
 # Usage
 
-Anywhere in your code (preferably in the file `main.ts`) import `devtools-fps`
+Anywhere in your code (preferably in the file `main.ts`) import `devtools-fps`:
 
 ```javascript
 import devtoolsFPS from "devtools-fps";
 ```
 
-this will automatically start at the bottom-right corder at 220x60 rect.
+...this will automatically start at the `bottom-right` corner of application page at `220x50` size.
 
-Run your app and now you'll dee the `devtools-fps` display running on top of your content.
+Run your app! You'll see the `devtools-fps` display running on top of your content.
 
 ## Positioning
 
-You can drag `devtools-fps` display around your screen, it will automatically snap to page sides.
+You can drag `devtools-fps` display around your screen, it will automatically snap to page edges.
 
 ## Resizing
 
-Grab the control points of `devtools-fps` display, which will activate when you hover close to it and drag it around to give it any size you like.
+Grab the control points of `devtools-fps` display, which will activate when you hover close to it, then drag it around to give it any size you like.
 
 ## Inspect
 
-Click on `devtools-fps` to toggle `inspect` mode. If mode is activated, the rendering will pause and a `Tooltip` will be displayed with data related to the corresponding buffer data, which includes:
+Click on `devtools-fps` to toggle `inspect` mode. If `inspect` mode is activated, the rendering will pause and a `Tooltip` will be displayed with data related to the corresponding buffer data, which includes:
 
 1. FPS
 2. Timestamp `HH:MM:SS:MS` (in local time)
@@ -53,7 +53,7 @@ Use it to reference various app events at specific times. Much like `performance
 
 ## Configuration
 
-You can further configure `devtools-fps` by using `.config()` method to customize it`s appearance, size, position and buffer size.
+You can further configure `devtools-fps` by using `.config()` method to customize it`s appearance, size, position and buffer size:
 
 ```ts
 // config type
@@ -64,7 +64,7 @@ type config = {
   height?: number;
   /** buffer size will determine the resolution and speed of motion */
   bufferSize?: number;
-  /** CSS style of canvas. you cannot set width, height and position */
+  /** CSS style of canvas. You shouldn't set "width", "height" and "position" */
   style?: Omit<Partial<CSSStyleDeclaration>, "width" | "height" | "position">;
 };
 ```
@@ -91,7 +91,7 @@ devtoolsFPS.config({
 // rest of your app
 ```
 
-In cases where you IDE will remove unused imports, simply call `.config()` with empty parameters.
+In cases where your IDE will remove unused imports, simply call `.config()` with empty parameters:
 
 ```ts
 import devtoolsFPS from "devtools-fps";
