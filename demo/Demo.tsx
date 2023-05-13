@@ -11,6 +11,7 @@ devtoolsFPS.config({
     backgroundColor: "rgba(0,0,30,0.5)",
     opacity: "0.9",
     left: window.innerWidth / 4 + "px",
+    boxShadow: "5px 5px 10px 0 rgba(0,0,0,0.5)",
   },
 });
 
