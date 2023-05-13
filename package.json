@@ -1,7 +1,7 @@
 {
   "name": "devtools-fps",
-  "version": "1.0.16",
-  "description": "FPS monitor devtool used for monitoring FPS while browser devtools are inactive in order to monitor FPS without other processes running at the same time, but also while application is rendered at full screen. Devtools-fps allows you to interact with it by pausing recording and inspecing specific frame performance and time the frame was rendered at in order to cross reference it with application activity. ",
+  "version": "2.0.0",
+  "description": "`devtools-fps` is an FPS monitor for web application performance observability without the use of browser devtools.",
   "main": "src/index.ts",
   "module": "src/index.ts",
   "type": "module",
