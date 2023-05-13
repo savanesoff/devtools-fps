@@ -2,7 +2,7 @@
 
 ![Validator](demo/devtools-fps-full-demo.gif)
 
-`devtools-fps` is a FPS monitor display used for a monitoring of web application performance without the use of browser devtools.
+`devtools-fps` is an FPS monitor for web application performance observability without the use of browser devtools.
 
 # Why? 🙃
 
