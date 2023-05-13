@@ -9,9 +9,9 @@ declare global {
 const devtoolsFPS =
   window.devtoolsFSP ||
   new DevtoolsFPS({
-    width: 200,
-    height: 80,
-    bufferSize: 200, // making it the same as width will ensure the pixel perfect rendering
+    width: 220,
+    height: 50,
+    bufferSize: 220, // making it the same as width will ensure the pixel perfect rendering
   });
 
 window.devtoolsFSP = devtoolsFPS;
