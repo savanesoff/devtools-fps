@@ -1,6 +1,6 @@
 {
   "name": "devtools-fps",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "`devtools-fps` is an FPS monitor for web application performance observability without the use of browser devtools.",
   "main": "src/index.ts",
   "module": "src/index.ts",
