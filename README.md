@@ -4,6 +4,8 @@
 
 `devtools-fps` is an FPS monitor for web application performance observability without the use of browser devtools.
 
+[See Demo](https://savanesoff.github.io/devtools-fps/)
+
 # Why? 🙃
 
 In order to monitor FPS without other processes running at the same time (browser devtools), but also while application is rendered at full screen. `devtools-fps` allows you to interact with it by pausing "recording" and inspecting a snapshot of a buffer for a specific frame performance and time the frame was rendered at.
