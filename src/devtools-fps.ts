@@ -48,7 +48,7 @@ export default class DevtoolsFPS {
     >,
     width = this.canvas.width,
     height = this.canvas.height,
-  }) {
+  } = {}) {
     if (bufferSize) {
       this.fps.buffers.setSize(bufferSize);
     }
