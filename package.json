@@ -2,20 +2,12 @@
   "name": "devtools-fps",
   "version": "2.0.2",
   "description": "`devtools-fps` is an FPS monitor for web application performance observability without the use of browser devtools.",
-  "main": "src/index.ts",
-  "module": "src/index.ts",
-  "type": "module",
-  "scripts": {
-    "test": "test",
-    "build": "tsc && vite build --base=./",
-    "dev": "vite",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+  "author": {
+    "name": "Samvel Avanesov",
+    "email": "sam.avanesoff@gmail.com"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/savanesoff/devtools-fps.git"
-  },
+  "private": false,
+  "license": "MIT",
   "keywords": [
     "fps",
     "devtools",
@@ -23,28 +15,76 @@
     "package",
     "monitoring"
   ],
-  "author": "savanesoff",
-  "license": "MIT",
+  "packageManager": "^pnpm@8.6.6",
+  "type": "module",
+  "release": {
+    "branches": [
+      "main"
+    ]
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/savanesoff/devtools-fps.git"
+  },
   "bugs": {
     "url": "https://github.com/savanesoff/devtools-fps/issues"
   },
   "homepage": "https://savanesoff.github.io/devtools-fps/",
-  "devDependencies": {
-    "@types/events": "^3.0.0",
-    "@types/json-schema": "^7.0.11",
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
-    "@typescript-eslint/eslint-plugin": "^5.59.2",
-    "@typescript-eslint/parser": "^5.59.2",
-    "@vitejs/plugin-react-swc": "^3.0.0",
-    "eslint": "^8.39.0",
-    "gh-pages": "^5.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "typescript": "^5.0.4",
-    "vite": "^4.3.5"
+  "types": "./dist/types/index.d.ts",
+  "main": "./dist/index.js",
+  "scripts": {
+    "dev": "vite",
+    "clean:demo": "rm -rf ./dist-demo",
+    "build:demo": "bash ./demo-build.sh --path tsconfig.build.demo.json",
+    "deploy:demo": "pnpm run build:demo && gh-pages -d dist-demo",
+    "preview": "vite preview",
+    "clean": "rm -rf ./dist",
+    "build": "pnpm run clean && pnpm run build:esm",
+    "build:esm": "tsc -p ./tsconfig.build.json && mv ./dist/index.js ./dist/index.mjs",
+    "prepack": "pnpm run build",
+    "test": "vitest --run",
+    "release": "pnpm run build && pnpm run test && pnpm changeset publish"
   },
   "dependencies": {
-    "events": "^3.3.0"
-  }
+    "overdrag": "^1.2.2"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.26.2",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.14.0",
+    "@testing-library/dom": "^9.3.1",
+    "@types/react": "^18.0.37",
+    "@types/react-dom": "^18.0.11",
+    "@typescript-eslint/eslint-plugin": "^5.59.0",
+    "@typescript-eslint/parser": "^5.59.0",
+    "@vitejs/plugin-react-swc": "^3.0.0",
+    "@vitest/coverage-v8": "^0.33.0",
+    "eslint": "^8.38.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.3.4",
+    "gh-pages": "^5.0.0",
+    "jsdom": "^22.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.0.2",
+    "vite": "^4.3.9",
+    "vitest": "^0.32.4",
+    "vitest-dom": "^0.1.0"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/index.mjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist/**/*"
+  ]
 }

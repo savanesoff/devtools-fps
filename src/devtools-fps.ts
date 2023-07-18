@@ -1,21 +1,17 @@
-import Controls from "./controls";
+import Overdrag from "overdrag";
 import Display from "./display";
 import FPS from "./fps";
-import StateMouse from "./state-mouse";
 import Tooltip from "./tooltip";
 
-export default class DevtoolsFPS {
+export default class DevtoolsFPS extends Overdrag {
   fps: FPS;
-  controls: Controls;
   display: Display;
   canvas: HTMLCanvasElement;
   run = false;
   render = true;
   inspect = false;
   snapshot: ReturnType<FPS["getSnapshot"]> | null = null;
-  mouseState: StateMouse;
   tooltip: Tooltip | null = null;
-  window: Window = window;
   snapshotBuffer: Float32Array | null = null;
   maxFPS = 60;
   constructor({
@@ -27,16 +23,15 @@ export default class DevtoolsFPS {
     height: number;
     bufferSize: number;
   }) {
-    this.canvas = document.createElement("canvas");
-    window.document.body.appendChild(this.canvas);
-
+    const element = document.createElement("canvas");
+    window.document.body.appendChild(element);
+    super({ element });
+    this.canvas = element;
     this.display = new Display(this.canvas, width, height, this.maxFPS);
-    this.mouseState = new StateMouse(this.canvas);
-    this.controls = new Controls(this.canvas, this.mouseState);
     this.fps = new FPS(bufferSize, this.maxFPS);
 
-    this.controls.on("update", () => this.drawCurrent());
-    this.mouseState.on("click", () => this.toggleInspect());
+    this.on("update", () => this.drawCurrent());
+    this.on("click", () => this.toggleInspect());
     this.start();
   }
 
@@ -54,9 +49,7 @@ export default class DevtoolsFPS {
     }
     this.canvas.width = width || this.canvas.width;
     this.canvas.height = height || this.canvas.height;
-    // @ts-ignore-next-line
     Object.assign(this.canvas.style, style);
-    this.mouseState.rect = this.canvas.getBoundingClientRect();
 
     this.drawCurrent();
   }
@@ -81,7 +74,7 @@ export default class DevtoolsFPS {
       const buffers = this.fps.getSnapshot().buffers;
       this.tooltip = new Tooltip(this.canvas, buffers.fps, buffers.times);
 
-      this.tooltip.update(this.mouseState.pageX, this.mouseState.pageY);
+      this.tooltip.update(this.offsetX, this.offsetY);
       this.snapshotBuffer = buffers.fps;
     } else if (this.tooltip != null) {
       this.tooltip.destroy();
@@ -94,7 +87,10 @@ export default class DevtoolsFPS {
   }
 
   drawCurrent() {
-    this.display.renderCurrent(this.mouseState.rect, this.inspect);
+    this.display.renderCurrent(
+      this.canvas.getBoundingClientRect(),
+      this.inspect
+    );
   }
 
   draw() {
@@ -103,13 +99,13 @@ export default class DevtoolsFPS {
         ? this.snapshotBuffer
         : this.fps.buffers.fps;
     this.display.update(
-      this.mouseState.rect,
+      this.canvas.getBoundingClientRect(),
       this.fps.now,
       this.fps.fps,
       this.fps.averageFPS,
       buffer,
       this.inspect,
-      this.mouseState.controlPoints
+      this.controls
     );
   }
 

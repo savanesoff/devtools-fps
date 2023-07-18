@@ -30,6 +30,8 @@ export default class Display {
     this.canvas.id = "devtools-fps-canvas";
     this.canvas.width = width;
     this.canvas.height = height;
+    // this.canvas.style.width = `${width}px`;
+    // this.canvas.style.height = `${height}px`;
     // @ts-ignore-next-line
     Object.assign(this.canvas.style, style);
     // @ts-ignore-next-line

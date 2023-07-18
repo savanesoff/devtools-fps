@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "useDefineForClassFields": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
@@ -10,21 +9,13 @@
     "moduleResolution": "bundler",
     "outDir": "dist-demo",
     "resolveJsonModule": true,
-    "isolatedModules": false,
-    // because this is a demo config
-    "declaration": false,
-    "declarationMap": false,
-    "jsx": "react-jsx",
 
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true,
-    "baseUrl": ".",
-    "types": ["vitest/globals"]
+    "baseUrl": "."
   },
-  "include": ["src", "demo", "tests"],
-  "references": [{ "path": "tsconfig.node.json" }]
+  "include": ["./demo", "./src"]
 }

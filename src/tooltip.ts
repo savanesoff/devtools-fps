@@ -4,7 +4,6 @@ const TIME_FORMAT: Intl.DateTimeFormatOptions = {
   hour: "2-digit",
   minute: "numeric",
   second: "2-digit",
-  // @ts-ignore-next-line
   fractionalSecondDigits: 3,
   hourCycle: "h23",
 };
@@ -40,7 +39,6 @@ export default class Tooltip {
     this.canvas = canvas;
     this.bufferFPS = bufferFPS;
     this.bufferTimes = bufferTimes;
-    // @ts-ignore-next-line
     Object.assign(this.tooltip.style, style);
     this.canvas.addEventListener("mouseenter", this.onMouseEnter);
     this.canvas.addEventListener("mouseleave", this.onMouseLeave);

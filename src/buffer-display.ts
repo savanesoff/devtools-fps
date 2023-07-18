@@ -30,7 +30,7 @@ export default class BufferDisplay {
     // clear area
     this.clear(rect);
     // render slices
-    let sliceWidth = rect.width / this.buffer.length;
+    const sliceWidth = rect.width / this.buffer.length;
     const maxSliceHeight = rect.height - style.marginTop;
     const minSliceHeight = maxSliceHeight * style.minimumSliceHeight;
     let x = 0;
