@@ -1,33 +1,56 @@
+import { Box, Button, Container, Link, Paper, Typography } from "@mui/material";
+import Grid from "@mui/material/Unstable_Grid2";
 import React from "react";
-import devtoolsFPS from "../src";
+import { BufferSizeSlider } from "./BufferSizeSlider";
+import { CpuLoadSlider } from "./CpuLoadSlider";
 import "./Demo.css";
+import { FpsCard } from "./FpsCard";
 import { useDevtoolsFPS } from "./useDevtoolsFPS";
-// customize the devtools-fps panel
-devtoolsFPS.config({
-  bufferSize: window.innerWidth / 2,
-  width: window.innerWidth / 2,
-  height: 200,
-  style: {
-    backgroundColor: "rgba(0,0,30,0.5)",
-    opacity: "0.9",
-    left: window.innerWidth / 4 + "px",
-    boxShadow: "5px 5px 10px 0 rgba(0,0,0,0.5)",
-  },
-});
 
 function Demo() {
   const { devtoolsFPS } = useDevtoolsFPS();
   return (
-    <div>
-      <h1>
-        Demo: <span className="brand">devtools-fps</span>
-      </h1>
+    <Container maxWidth="lg">
+      <Box
+        flex={1}
+        display="flex"
+        flexDirection={"column"}
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Typography variant="h2">devtools-fps demo</Typography>
+
+        <Link href="https://github.com/savanesoff/overdrag">
+          <img src="https://raw.githubusercontent.com/savanesoff/protosus/main/public/icons/by-protosus.svg" />
+        </Link>
+      </Box>
       <div>
-        <div className="info-block">
-          <p>Data</p>
-          <div>fps: {devtoolsFPS.fps.fps}</div>
-          <div>average: {devtoolsFPS.fps.averageFPS}</div>
-        </div>
+        <Paper elevation={2}>
+          <Typography variant="h6" component="h2">
+            Controls
+          </Typography>
+
+          <Grid container spacing={2}>
+            <Grid xs={3} flexDirection="row" justifyContent={"flex-start"}>
+              <Button
+                onClick={devtoolsFPS.toggleRun}
+                variant="contained"
+                sx={{
+                  color: !devtoolsFPS.run ? "#a33d4e" : "#1d9f81",
+                }}
+              >
+                {devtoolsFPS.run ? "Stop" : "Start"}
+              </Button>
+              <FpsCard />
+            </Grid>
+            <Grid xs={3}>
+              <BufferSizeSlider />
+            </Grid>
+            <Grid xs={3}>
+              <CpuLoadSlider />
+            </Grid>
+          </Grid>
+        </Paper>
         <div className="info-block">
           <h3>Controls</h3>
           <div className="controls-container">
@@ -108,7 +131,7 @@ function Demo() {
           </ol>
         </div>
       </div>
-    </div>
+    </Container>
   );
 }
 

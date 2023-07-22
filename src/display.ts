@@ -6,7 +6,7 @@ import StateMouse from "./state-mouse";
 const style = {
   position: "absolute",
   top: "auto",
-  bottom: "0",
+  bottom: "0px  ",
   left: "auto",
   right: "0",
   backgroundColor: "rgba(0,0,30,0.5)",
@@ -20,23 +20,16 @@ export default class Display {
   bufferDisplay: BufferDisplay;
   controlPointWidth = 4;
   controlPointLength = 40;
-  constructor(
-    canvas: HTMLCanvasElement,
-    width: number,
-    height: number,
-    maxFPS: number
-  ) {
+  constructor(canvas: HTMLCanvasElement, maxFPS: number) {
     this.canvas = canvas;
     this.canvas.id = "devtools-fps-canvas";
-    this.canvas.width = width;
-    this.canvas.height = height;
-    // this.canvas.style.width = `${width}px`;
-    // this.canvas.style.height = `${height}px`;
-    // @ts-ignore-next-line
     Object.assign(this.canvas.style, style);
-    // @ts-ignore-next-line
-    this.ctx = this.canvas.getContext("2d");
-    if (!this.ctx) throw new Error("Could not get canvas context");
+    const ctx = this.canvas.getContext("2d");
+    if (ctx) {
+      this.ctx = ctx;
+    } else {
+      throw new Error("Could not get canvas context");
+    }
     this.fpsDisplay = new FPSDisplay(this.ctx);
     this.bufferDisplay = new BufferDisplay(this.ctx, maxFPS);
   }

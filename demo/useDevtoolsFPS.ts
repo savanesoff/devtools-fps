@@ -3,17 +3,18 @@ import devtoolsFPS from "../src/index";
 
 export function useDevtoolsFPS(): {
   devtoolsFPS: typeof devtoolsFPS;
-  _: boolean;
+  _: ReturnType<typeof setTimeout> | undefined;
 } {
-  const [trigger, setTrigger] = useState(false);
+  const [id, setId] = useState<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
-    setInterval(() => {
-      setTrigger(!trigger);
+    const id = setTimeout(() => {
+      setId(id);
     }, 200);
-  }, [trigger]);
+  }, [id]);
+
   return {
     devtoolsFPS,
-    _: trigger,
+    _: id,
   };
 }

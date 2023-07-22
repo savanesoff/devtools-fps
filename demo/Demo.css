@@ -1,41 +1,9 @@
-.info-block {
-  background-color: rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 0, 0, 0.4);
-  margin: 0.2rem;
-  padding: 1rem;
-  padding-top: 0.1rem;
+body {
+  width: 100vw;
+  height: 100vh;
 }
-
-li {
-  line-height: 1.5rem;
-}
-
-.controls-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 2rem;
-  align-items: center;
-  width: fit-content;
-}
-
-.range-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  background-color: rgba(0, 0, 0, 0.1);
-  padding: 0.5rem;
-  border: 1px solid rgba(0, 0, 0, 0.4);
-  justify-content: "space-around";
-}
-
-.brand {
-  /* font-size: 1.2rem; */
-  font-weight: bold;
-  color: cyan;
-  text-shadow: 3px 5px 5px #000;
-  text-align: center;
-  margin: 0.5rem;
+* {
+  font-family: "Roboto", sans-serif;
 }
 
 canvas {

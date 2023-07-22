@@ -55,6 +55,7 @@
     "@changesets/cli": "^2.26.2",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.1",
     "@mui/material": "^5.14.0",
     "@testing-library/dom": "^9.3.1",
     "@types/react": "^18.0.37",

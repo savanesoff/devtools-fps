@@ -1,4 +1,4 @@
-import Overdrag from "overdrag";
+import Overdrag from "../../overdrag/src";
 import Display from "./display";
 import FPS from "./fps";
 import Tooltip from "./tooltip";
@@ -12,7 +12,11 @@ export default class DevtoolsFPS extends Overdrag {
   inspect = false;
   snapshot: ReturnType<FPS["getSnapshot"]> | null = null;
   tooltip: Tooltip | null = null;
-  snapshotBuffer: Float32Array | null = null;
+  snapshotBuffers: {
+    buffers: { fps: Float32Array; times: Float32Array };
+    fps: number;
+    averageFPS: number;
+  } | null = null;
   maxFPS = 60;
   constructor({
     width,
@@ -26,12 +30,15 @@ export default class DevtoolsFPS extends Overdrag {
     const element = document.createElement("canvas");
     window.document.body.appendChild(element);
     super({ element });
+    this.setElementBounds({ width, height });
     this.canvas = element;
-    this.display = new Display(this.canvas, width, height, this.maxFPS);
+    this.display = new Display(this.canvas, this.maxFPS);
     this.fps = new FPS(bufferSize, this.maxFPS);
-
+    // this prevents delay between size change and rendering
     this.on("update", () => this.drawCurrent());
     this.on("click", () => this.toggleInspect());
+    this.on(Overdrag.EVENTS.OVER, this.onMouseEnter);
+    this.cursors.OVER = "default";
     this.start();
   }
 
@@ -47,10 +54,10 @@ export default class DevtoolsFPS extends Overdrag {
     if (bufferSize) {
       this.fps.buffers.setSize(bufferSize);
     }
-    this.canvas.width = width || this.canvas.width;
-    this.canvas.height = height || this.canvas.height;
-    Object.assign(this.canvas.style, style);
-
+    this.setElementBounds({ width, height });
+    if (style) {
+      Object.assign(this.canvas.style, style);
+    }
     this.drawCurrent();
   }
 
@@ -71,14 +78,39 @@ export default class DevtoolsFPS extends Overdrag {
   toggleInspect() {
     this.inspect = !this.inspect;
     if (this.inspect) {
-      const buffers = this.fps.getSnapshot().buffers;
-      this.tooltip = new Tooltip(this.canvas, buffers.fps, buffers.times);
+      this.snapshotBuffers = this.fps.getSnapshot();
+      this.onMouseEnter();
+      this.renderTooltip();
+    } else {
+      this.snapshotBuffers = null;
+      this.removeTooltip();
+    }
+  }
 
-      this.tooltip.update(this.offsetX, this.offsetY);
-      this.snapshotBuffer = buffers.fps;
-    } else if (this.tooltip != null) {
+  onMouseEnter() {
+    if (!this.inspect || !this.snapshotBuffers) return;
+    this.tooltip = new Tooltip(
+      this.canvas,
+      this.snapshotBuffers.buffers.fps,
+      this.snapshotBuffers.buffers.times
+    );
+
+    this.on(Overdrag.EVENTS.MOVE, this.renderTooltip);
+    this.on(Overdrag.EVENTS.OUT, this.removeTooltip);
+  }
+
+  removeTooltip() {
+    if (this.tooltip) {
       this.tooltip.destroy();
       this.tooltip = null;
+      this.off(Overdrag.EVENTS.MOVE, this.renderTooltip);
+      this.off(Overdrag.EVENTS.OUT, this.removeTooltip);
+    }
+  }
+
+  renderTooltip() {
+    if (this.tooltip) {
+      this.tooltip.update(this.clientX, this.clientY);
     }
   }
 
@@ -95,8 +127,8 @@ export default class DevtoolsFPS extends Overdrag {
 
   draw() {
     const buffer =
-      this.inspect && this.snapshotBuffer
-        ? this.snapshotBuffer
+      this.inspect && this.snapshotBuffers?.buffers.fps
+        ? this.snapshotBuffers?.buffers.fps
         : this.fps.buffers.fps;
     this.display.update(
       this.canvas.getBoundingClientRect(),

@@ -3,18 +3,20 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme, Theme, ThemeProvider } from "@mui/material/styles";
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { getFPSColor } from "../src/colors";
 import Demo from "./Demo";
 
 const theme: Theme = createTheme({
   typography: {
     allVariants: {
-      color: "#dedede",
+      color: "#afafaf",
     },
   },
+
   palette: {
     background: {
-      default: "#3d3c3c",
-      paper: "#242424",
+      default: "#e6e6e6",
+      paper: "#1c1c1c",
     },
     primary: {
       // Purple and green play nicely together.
@@ -22,7 +24,7 @@ const theme: Theme = createTheme({
     },
     secondary: {
       // This is green.A700 as hex.
-      main: "#11cb5f",
+      main: getFPSColor(60),
     },
   },
 });
